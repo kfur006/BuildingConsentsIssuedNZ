@@ -1,0 +1,60 @@
+---
+title: "Building consents issued"
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+  html_document:
+    df_print: paged
+    toc: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+#Introduction
+This is the analysis of Building consents issued in NZ.
+The data is from the Statistics NZ and can be extracted from [here](https://www.stats.govt.nz/information-releases/building-consents-issued-october-2018) .
+Note that the file is updated monthly.
+Also, to prevent the future issues of the modification of the original file in Statistics NZ, the copy of the file must be saved on the local machine as well.
+
+#Contents and Data Definition
+List of data contents and its definition.
+
+##Files in the zip file:
+Write the list of files.
+
+##Data definition:
+Write the definitions.
+
+#Data Extraction
+Remember to save the copy on the local machine.
+`r ExtractFile` is the function to extract data from zip file directly.
+Need to modify the code to choose the file by file name instead of specifying the number...
+
+`r Building.df` contains data from 2000 (maybe after 2010 is better?).
+
+
+```{r echo = T}
+
+library(tidyverse)
+ExtractFile <- function(x, y){
+  #x is the URL of ZIP
+  #y is the file number (3rd file etc.)
+  if(missing(x)|missing(y)){
+    stop("url or file number is missing.")
+  }
+  temp <- tempfile()
+  download.file(x,
+                temp)
+  unz(temp, "TempFile")
+  #Extracting the yth file. better to be re-written to file name?
+  mydata <- read.csv(unz(temp,unzip(temp, list=TRUE)$Name[y]), header = T)
+  return(mydata)
+  unlink(temp)
+}
+Building.df <- ExtractFile("https://www.stats.govt.nz/assets/Uploads/Building-consents-issued/Building-consents-issued-October-2018/Download-data/building-consents-issued-october-2018-csv-tables.zip", 3) %>% 
+  filter(., as.numeric(substr(as.character(Period), 1, 4))>1999) 
+
+```
+
+
